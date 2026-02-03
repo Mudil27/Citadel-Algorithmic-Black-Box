@@ -1,0 +1,44 @@
+import schemdraw
+import schemdraw.elements as elm
+
+# Create a new drawing
+with schemdraw.Drawing() as d:
+    # 1. Add the OpAmp
+    # We use 'anchor' to position the opamp correctly relative to inputs later
+    op = d.add(elm.Opamp(leads=True).label('Inverting amplifier', loc='bottom', fontsize=12))
+
+    # 2. Input Resistor (R1) connecting to the inverting input
+    # The inverting input of the OpAmp element is typically 'in1' (negative)
+    d.add(elm.Resistor().left().at(op.in1).label('$R_1$', loc='bottom').label('$V_i$', loc='left'))
+
+    # 3. Non-inverting input to Ground
+    # The non-inverting input is 'in2' (positive)
+    d.add(elm.Line().down().at(op.in2).length(1))
+    d.add(elm.Ground())
+
+    # 4. Feedback Loop (R2)
+    # Go up from the inverting input node
+    d.add(elm.Line().up().at(op.in1).length(1.5))
+    # Go right through the resistor R2
+    d.add(elm.Resistor().right().label('$R_2$').length(4)) # Adjusted length to span the OpAmp
+    # Go down to connect to the output
+    d.add(elm.Line().down().tox(op.out))
+    
+    # 5. Connect OpAmp output to the feedback loop
+    d.add(elm.Line().right().at(op.out).length(1))
+    
+    # Add a dot at the junction where feedback meets output
+    d.add(elm.Dot())
+
+    # 6. Output Terminal (Vo)
+    d.add(elm.Line().right().length(1).label('$V_o$', loc='right'))
+
+    # 7. Load Resistor (RL) - Dashed line as per your image
+    # Go down from the output node
+    d.add(elm.Line().down().length(1).style('dashed'))
+    d.add(elm.Resistor().down().label('$R_L$').style('dashed'))
+    d.add(elm.Ground().style('dashed'))
+
+    # Save or show the drawing
+    d.draw()
+    # d.save('inverting_amplifier.png') # Uncomment to save
